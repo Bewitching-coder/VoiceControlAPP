@@ -4,4 +4,23 @@
     <string name="you_can_say">你可以说</string>
     <string name="listening_prompt">小智正在听，请说...</string>
     <string name="opening_prompt">正在打开</string>
+    <string name="wechat_clean">微信清理</string>
+    <string name="duplicate_image">重复图片</string>
+    <string name="auto_clean">自动清理</string>
+    <string name="battery_save">手机省电</string>
+    <string name="cooldown_phone">手机降温</string>
+    <string name="description_wechatButton">WeChat Clean Button</string>
+    <string name="description_imageButton">Duplicate Image Button</string>
+    <string name="description_autocleanButton">Auto Clean Button</string>
+    <string name="description_batteryButton">Battery Button</string>
+    <string name="description_cooldownButton">Cool Down Button</string>
+    <string name="description_aboutButton">About Button</string>
+    <string name="privacy_policy">隐私协议</string>
+    <string name="user_agreement">用户协议</string>
+    <string name="about_us">关于我们</string>
+    <string name="voice_recognition_settings">语音识别设置</string>
+    <string name="software_version">软件版本</string>
+    <string name="version_number">1.0.7</string>
+    <string name="back_button_description">返回</string>
+
 </resources>

@@ -8,8 +8,11 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
 import com.example.app.R;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.ImageView;
+import android.content.Intent;
+import com.example.app.settingpage.SettingActivity;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -19,6 +22,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ImageButton btnSettings = findViewById(R.id.aboutButton);
+        btnSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 打开设置页
+                Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+                startActivity(intent);
+            }
+        });
 
         LottieAnimationView animationView = findViewById(R.id.animation_view);
         LottieAnimationView rippleAnimation = findViewById(R.id.ripple_animation);
