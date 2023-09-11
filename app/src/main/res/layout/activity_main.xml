@@ -1,259 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/bg"
-    android:paddingLeft="16dp"
-    android:paddingTop="16dp"
-    android:paddingRight="16dp"
-    android:paddingBottom="16dp">
+    android:background="@mipmap/bg">
 
-
-    <ImageButton
-        android:id="@+id/aboutButton"
+    <!-- Guideline for dividing the two fragments -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:background="@null"
-        android:layout_marginTop="8dp"
-        android:contentDescription="@string/description_aboutButton"
-        android:src="@mipmap/ic_about"
-        app:layout_constraintBottom_toTopOf="@+id/cardView"
-        app:layout_constraintEnd_toEndOf="@+id/cardView"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/cardView" />
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.33" />
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
+    <!-- Placeholder for the top fragment -->
+    <FrameLayout
+        android:id="@+id/fragment_container_top"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:cardCornerRadius="8dp"
-        app:layout_constraintBottom_toTopOf="@id/txt_prompt"
-        app:layout_constraintBottom_toBottomOf="@id/aboutButton"
-        app:cardElevation="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:baselineAligned="false"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:weightSum="5">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <!-- WeChat Clean Button -->
-                <ImageButton
-                    android:id="@+id/wechatButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:contentDescription="@string/description_wechatButton"
-                    android:src="@mipmap/wechat" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/wechat_clean"
-                    android:textSize="15sp" />
-
-            </LinearLayout>
-
-            <!--  Image Button -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageButton
-                    android:id="@+id/imageButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:contentDescription="@string/description_imageButton"
-                    android:src="@mipmap/image" />
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/duplicate_image"
-                    android:textSize="15sp" />
-
-            </LinearLayout>
-
-            <!-- Auto Clean Button -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageButton
-                    android:id="@+id/autocleanButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:contentDescription="@string/description_autocleanButton"
-                    android:src="@mipmap/autoclean" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/auto_clean"
-                    android:textSize="15sp" />
-
-            </LinearLayout>
-
-            <!-- Battery Button -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageButton
-                    android:id="@+id/batteryButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:contentDescription="@string/description_batteryButton"
-                    android:src="@mipmap/battery" />
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/battery_save"
-                    android:textSize="15sp" />
-
-            </LinearLayout>
-
-
-            <!-- Cooldown Button -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageButton
-                    android:id="@+id/cooldownButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:contentDescription="@string/description_cooldownButton"
-                    android:src="@mipmap/cooldown" />
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/cooldown_phone"
-                    android:textSize="15sp" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-    <!-- Initial state animation -->
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/animation_view"
-        android:layout_width="176dp"
-        android:layout_height="179dp"
-        android:contentDescription="@string/description_for_animation_view"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.753"
-        app:lottie_rawRes="@raw/initial_state" />
+        app:layout_constraintBottom_toTopOf="@id/guideline" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/top_animation"
-        android:layout_width="421dp"
-        android:layout_height="151dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@id/animation_view"
-        app:layout_constraintEnd_toEndOf="@id/animation_view"
-        app:layout_constraintStart_toStartOf="@id/animation_view"
-        app:lottie_rawRes="@raw/you_can_say" />
-
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/ripple_animation"
-        android:layout_width="772dp"
-        android:layout_height="623dp"
-        app:layout_constraintBottom_toBottomOf="@id/animation_view"
-        app:layout_constraintEnd_toEndOf="@id/animation_view"
-        app:layout_constraintStart_toStartOf="@id/animation_view"
-        app:layout_constraintTop_toTopOf="@id/animation_view"
-        app:layout_constraintVertical_bias="0.502"
-        app:lottie_rawRes="@raw/ripple" />
-
-    <TextView
-        android:id="@+id/txt_prompt"
-        android:layout_width="86dp"
-        android:layout_height="39dp"
-        android:layout_marginBottom="4dp"
-        android:gravity="center"
-        android:text="@string/you_can_say"
-        android:textSize="17sp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@id/top_animation"
-        app:layout_constraintEnd_toEndOf="@id/animation_view"
-        app:layout_constraintStart_toStartOf="@id/animation_view" />
-
-    <ImageView
-        android:id="@+id/img_voice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:gravity="center"
-        android:src="@mipmap/voice_text"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="@id/animation_view"
-        app:layout_constraintStart_toStartOf="@id/animation_view"
-        app:layout_constraintTop_toBottomOf="@id/animation_view" />
-
-    <TextView
-        android:id="@+id/txt_listening"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/listening_prompt"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@id/animation_view"
-        app:layout_constraintStart_toStartOf="@id/animation_view"
-        app:layout_constraintTop_toBottomOf="@id/animation_view" />
-
-    <TextView
-        android:id="@+id/txt_opening"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/opening_prompt"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@id/animation_view"
-        app:layout_constraintStart_toStartOf="@id/animation_view"
-        app:layout_constraintTop_toBottomOf="@id/animation_view" />
+    <!-- Placeholder for the bottom fragment -->
+    <FrameLayout
+        android:id="@+id/fragment_container_bottom"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guideline"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
