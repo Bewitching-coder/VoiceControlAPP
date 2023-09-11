@@ -22,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
 
         LottieAnimationView animationView = findViewById(R.id.animation_view);
         LottieAnimationView rippleAnimation = findViewById(R.id.ripple_animation);
+        LottieAnimationView sayAnimation = findViewById(R.id.top_animation);
+
 
         TextView txtPrompt = findViewById(R.id.txt_prompt);
         ImageView imgVoice = findViewById(R.id.img_voice);
@@ -37,6 +39,10 @@ public class MainActivity extends AppCompatActivity {
         animationView.setAnimation(R.raw.initial_state);
         animationView.setRepeatCount(LottieDrawable.INFINITE);  // 设置动画无限循环
         animationView.playAnimation();
+
+        sayAnimation.setAnimation(R.raw.you_can_say);
+        sayAnimation.setRepeatCount(LottieDrawable.INFINITE);
+        sayAnimation.playAnimation();
 
         animationView.setOnTouchListener((v, event) -> {
             switch (event.getAction()) {
