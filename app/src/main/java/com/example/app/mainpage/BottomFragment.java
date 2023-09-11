@@ -78,7 +78,7 @@ public class BottomFragment extends Fragment {
                     txtOpening.setVisibility(View.VISIBLE);
                     sayAnimation.setVisibility(View.GONE);
 
-                    txtListening.setVisibility(View.VISIBLE);
+                    txtListening.setVisibility(View.GONE);
                     speechOutput.setVisibility(View.VISIBLE);
                     txtSpeechResult.setText("This is placeholder text");
 
