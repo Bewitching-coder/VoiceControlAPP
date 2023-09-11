@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">语音控制APP</string>
+    <string name="description_for_animation_view">initial_state</string>
+    <string name="you_can_say">你可以说</string>
+    <string name="listening_prompt">小智正在听，请说...</string>
+    <string name="opening_prompt">正在打开</string>
 </resources>
