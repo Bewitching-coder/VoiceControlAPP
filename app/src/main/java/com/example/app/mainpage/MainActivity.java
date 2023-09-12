@@ -25,6 +25,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import utils.AlimeHelper;
 import utils.PermissionsUtil;
 
 
@@ -62,31 +63,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void sendMessageToAILME(String messageContent) {
-        OkHttpClient client = new OkHttpClient();
-
-        // 构建请求体
-        String requestBodyStr = "{\"messages\":[{\"content\":\"" + messageContent + "\",\"role\":\"user\"}]}";
-        RequestBody requestBody = RequestBody.create(requestBodyStr, MediaType.parse("application/json; charset=utf-8"));
-
-        Request request = new Request.Builder()
-                .url("https://bjcn-api.apusai.com/ai/chat/")
-                .post(requestBody)
-                .addHeader("Content-Type", "application/json")
-                .addHeader("X-Auth-Key", "ShznkDwvIcsrhUNT1BeGs8gT0mjZR5XIrSquWpfsjvLMwhvW")
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
+    private void sendMessageToAlime(String messageContent) {
+        AlimeHelper.sendMessageToAlime(messageContent, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                // 处理请求失败的逻辑
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String responseStr = response.body().string();
-                    // 这里处理返回的数据
+                    // 处理返回的数据
+                } else {
+                    // 处理请求失败的逻辑
                 }
             }
         });
