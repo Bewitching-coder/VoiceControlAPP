@@ -1,8 +1,11 @@
 package com.example.app.mainpage;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.content.DialogInterface;
+import android.provider.Settings;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -12,6 +15,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+
 import com.example.app.R;
 
 import okhttp3.Call;
@@ -40,7 +44,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         checkAndRequestPermissions();
-        checkAllPermissions();
+        showPermanentDeniedDialog();
+
 
         // Load the top fragment
         if (savedInstanceState == null) {
@@ -121,26 +126,68 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .show();
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == PERMISSIONS_REQUEST_CODE) {
             for (int i = 0; i < permissions.length; i++) {
-                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "您需要授予所有权限以使用此应用", Toast.LENGTH_LONG).show();
-                    return;
+                if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
+                    if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[i])) {
+                        // 用户已经永久拒绝了这个权限
+                        showPermanentDeniedDialog();
+                        return;
+                    } else {
+                        Toast.makeText(this, "您需要授予所有权限以使用此应用", Toast.LENGTH_LONG).show();
+                        return;
+                    }
                 }
             }
-            // 如果所有权限都被授权，可以继续您的应用的其他初始化
+            // 如果所有权限都被授权，可以继续应用的其他初始化
         }
     }
-    private void checkAllPermissions() {
-        for (String permission : requiredPermissions) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, requiredPermissions, PERMISSIONS_REQUEST_CODE);
-                return;
-            }
+
+    private void checkForPermanentlyDeniedPermissions() {
+        boolean isAnyPermissionPermanentlyDenied = false;
+
+        // 检查语音权限是否被永久拒绝
+        if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO) &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED) {
+            isAnyPermissionPermanentlyDenied = true;
+        }
+        if (isAnyPermissionPermanentlyDenied) {
+            showPermanentDeniedDialog();
         }
     }
+
+    private void showPermanentDeniedDialog() {
+        // 先检查所有关键权限是否都已经被授权了
+        boolean areAllPermissionsGranted = true;
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            areAllPermissionsGranted = false;
+        }
+        // 如果所有关键权限都已经被授权，直接返回，不显示弹窗
+        if (areAllPermissionsGranted) {
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("权限被拒绝")
+                .setMessage("您已经拒绝了一些必要的权限，这可能会影响应用的功能。请到设置中手动授予权限。")
+                .setPositiveButton("前往设置", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent();
+                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", getPackageName(), null);
+                        intent.setData(uri);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
+    }
+
 }

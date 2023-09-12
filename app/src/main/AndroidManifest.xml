@@ -27,6 +27,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".settingpage.SettingActivity"></activity>
+        <activity android:name=".openvideo.VideoPlayerActivity" />
+        <activity android:name=".openweb.WebViewActivity" />
+
+
 
 
     </application>
