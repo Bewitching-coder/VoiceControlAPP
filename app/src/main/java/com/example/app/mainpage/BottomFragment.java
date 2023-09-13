@@ -50,7 +50,6 @@ public class BottomFragment extends Fragment {
     }
 
     private void initSpeechRecognizer() {
-        try {
             // 初始化讯飞语音识别
             String APPID = "a16921d1";
             SpeechUtility.createUtility(getContext(), SpeechConstant.APPID + "=" + APPID);
@@ -61,12 +60,7 @@ public class BottomFragment extends Fragment {
                 mIat.setParameter(SpeechConstant.ACCENT, "mandarin");
                 String FEMALE_VOICE = "xiaoyan";
                 mIat.setParameter(SpeechConstant.VOICE_NAME, FEMALE_VOICE);
-            } else {
-                Log.e("BottomFragment", "SpeechRecognizer is null");
             }
-        } catch (Exception e) {
-            Log.e("BottomFragment", "Error initializing SpeechRecognizer: " + e.toString());
-        }
     }
 
     private static final int RECORD_AUDIO_REQUEST_CODE = 101;
@@ -132,6 +126,7 @@ public class BottomFragment extends Fragment {
                     } else {
                         Log.e("BottomFragment", "SpeechRecognizer is null during touch event.");
                     }
+
                     return true;
 
                 case MotionEvent.ACTION_UP:
@@ -141,9 +136,6 @@ public class BottomFragment extends Fragment {
 
                     txtListening.setVisibility(View.GONE);
                     speechOutput.setVisibility(View.VISIBLE);
-                    if(txtSpeechResult != null) {
-                        txtSpeechResult.setText(recognizedText);
-                    }
 
 
                     animationView.cancelAnimation();
@@ -156,6 +148,9 @@ public class BottomFragment extends Fragment {
                         mIat.stopListening();
                     } else {
                         Log.e("BottomFragment", "SpeechRecognizer is null during touch event.");
+                    }
+                    if(txtSpeechResult != null) {
+                        txtSpeechResult.setText(recognizedText);
                     }
                     return true;
             }
@@ -195,8 +190,8 @@ public class BottomFragment extends Fragment {
                 Log.d("RecognizerListener", "Parsed text: " + recognizedText);
 
                 // 更新UI
-                getActivity().runOnUiThread(() -> {
-                    TextView txtSpeechResult = getView().findViewById(R.id.txt_speech_result);
+                requireActivity().runOnUiThread(() -> {
+                    TextView txtSpeechResult = requireView().findViewById(R.id.txt_speech_result);
                     txtSpeechResult.setText(recognizedText);
                 });
             }
