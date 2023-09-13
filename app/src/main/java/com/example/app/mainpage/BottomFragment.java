@@ -1,6 +1,7 @@
 package com.example.app.mainpage;
 
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +19,6 @@ import androidx.fragment.app.Fragment;
 import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
 import com.example.app.R;
-import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.RecognizerListener;
 import com.iflytek.cloud.RecognizerResult;
 import com.iflytek.cloud.SpeechConstant;
@@ -28,12 +28,13 @@ import com.iflytek.cloud.SpeechUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
+import androidx.core.content.ContextCompat;
+import android.widget.Toast;
+import android.Manifest;
 
 public class BottomFragment extends Fragment {
     private SpeechRecognizer mIat;  // 使用讯飞的语音识别类
     private String recognizedText = "";
-    private final String APPID = "a16921d1";
-    private final String FEMALE_VOICE = "xiaoyan";
     private final String MALE_VOICE = "aisjiuxu";
 
 
@@ -51,12 +52,14 @@ public class BottomFragment extends Fragment {
     private void initSpeechRecognizer() {
         try {
             // 初始化讯飞语音识别
+            String APPID = "a16921d1";
             SpeechUtility.createUtility(getContext(), SpeechConstant.APPID + "=" + APPID);
             mIat = SpeechRecognizer.createRecognizer(getContext(), null);
             if (mIat != null) {
                 mIat.setParameter(SpeechConstant.DOMAIN, "iat");
                 mIat.setParameter(SpeechConstant.LANGUAGE, "zh_cn");
                 mIat.setParameter(SpeechConstant.ACCENT, "mandarin");
+                String FEMALE_VOICE = "xiaoyan";
                 mIat.setParameter(SpeechConstant.VOICE_NAME, FEMALE_VOICE);
             } else {
                 Log.e("BottomFragment", "SpeechRecognizer is null");
@@ -66,10 +69,13 @@ public class BottomFragment extends Fragment {
         }
     }
 
+    private static final int RECORD_AUDIO_REQUEST_CODE = 101;
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        requestMicrophonePermission();
 
         LottieAnimationView animationView = view.findViewById(R.id.animation_view);
         LottieAnimationView rippleAnimation = view.findViewById(R.id.ripple_animation);
@@ -97,6 +103,10 @@ public class BottomFragment extends Fragment {
         animationView.setOnTouchListener((v, event) -> {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
+                    if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                        requestMicrophonePermission();
+                        return true; // 结束处理触摸事件
+                    }
                     txtPrompt.setVisibility(View.GONE);
                     imgVoice.setVisibility(View.GONE);
                     txtOpening.setVisibility(View.GONE);
@@ -122,10 +132,6 @@ public class BottomFragment extends Fragment {
                     } else {
                         Log.e("BottomFragment", "SpeechRecognizer is null during touch event.");
                     }
-
-                    new Thread(() -> {
-                        mIat.startListening(mRecognizerListener);
-                    }).start();
                     return true;
 
                 case MotionEvent.ACTION_UP:
@@ -145,15 +151,37 @@ public class BottomFragment extends Fragment {
                     animationView.setScaleY(1f);
                     animationView.setAnimation(R.raw.opening);
                     animationView.playAnimation();
-                    mIat.stopListening();
 
-                    new Thread(() -> {
+                    if (mIat != null) {
                         mIat.stopListening();
-                    }).start();
+                    } else {
+                        Log.e("BottomFragment", "SpeechRecognizer is null during touch event.");
+                    }
                     return true;
             }
             return false;
         });
+    }
+
+    private void requestMicrophonePermission() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case RECORD_AUDIO_REQUEST_CODE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // 权限已获得，可以开始语音识别
+                } else {
+                    // 权限被拒绝，告知用户为什么需要这个权限
+                    Toast.makeText(getContext(), "需要麦克风权限来进行语音识别", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
     }
 
     RecognizerListener mRecognizerListener = new RecognizerListener() {
@@ -162,6 +190,9 @@ public class BottomFragment extends Fragment {
             if (recognizerResult != null) {
                 String jsonResult = recognizerResult.getResultString();
                 recognizedText = parseResult(jsonResult);
+
+                // 添加Log以查看解析结果
+                Log.d("RecognizerListener", "Parsed text: " + recognizedText);
 
                 // 更新UI
                 getActivity().runOnUiThread(() -> {
