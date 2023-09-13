@@ -5,10 +5,10 @@ plugins {
 
 android {
     compileSdk = 33
-    namespace = "com.example.app" // 添加这一行
+    namespace = "com.example.app"
 
     defaultConfig {
-        applicationId = "com.example.app"
+        applicationId = "com.znsjqlbandroid.clnprojects"
         minSdk = 24
         targetSdk = 33
         versionCode = 1
@@ -23,10 +23,12 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -43,5 +45,4 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
     implementation(files("jniLibs/Msc.jar"))
     implementation("com.google.code.gson:gson:2.8.9")
-
 }
