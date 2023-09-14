@@ -19,16 +19,21 @@ import androidx.fragment.app.Fragment;
 import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
 import com.example.app.R;
+import com.iflytek.cloud.ErrorCode;
+import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.RecognizerListener;
 import com.iflytek.cloud.RecognizerResult;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
 import com.iflytek.cloud.SpeechUtility;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
+
 import androidx.core.content.ContextCompat;
+
 import android.widget.Toast;
 import android.Manifest;
 
@@ -40,28 +45,59 @@ public class BottomFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_bottom, container, false);
+        Log.d("BottomFragment", "onCreateView called.");
+        View view = inflater.inflate(R.layout.fragment_bottom, container, false);
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d("BottomFragment", "onActivityCreated called.");
+        initSpeechRecognizer();
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initSpeechRecognizer();
+        Log.d("BottomFragment", "onCreate called.");
     }
 
     private void initSpeechRecognizer() {
-            // 初始化讯飞语音识别
-            String APPID = "a16921d1";
-            SpeechUtility.createUtility(getContext(), SpeechConstant.APPID + "=" + APPID);
-            mIat = SpeechRecognizer.createRecognizer(getContext(), null);
-            if (mIat != null) {
-                mIat.setParameter(SpeechConstant.DOMAIN, "iat");
-                mIat.setParameter(SpeechConstant.LANGUAGE, "zh_cn");
-                mIat.setParameter(SpeechConstant.ACCENT, "mandarin");
-                String FEMALE_VOICE = "xiaoyan";
-                mIat.setParameter(SpeechConstant.VOICE_NAME, FEMALE_VOICE);
-            }
+        Log.d("BottomFragment", "Initializing SpeechRecognizer.");
+        // 确保 getContext() 不为 null
+        if (getContext() == null) {
+            Log.e("BottomFragment", "Context is null. Cannot initialize SpeechRecognizer.");
+            return;
+        }
+        // 初始化讯飞语音识别
+        String APPID = "a16921d1";
+        SpeechUtility.createUtility(getContext(), SpeechConstant.APPID + "=" + APPID);
+        mIat = SpeechRecognizer.createRecognizer(getContext(), new MyInitListener());
+        if (mIat != null) {
+            Log.d("BottomFragment", "SpeechRecognizer created successfully.");
+            mIat.setParameter(SpeechConstant.DOMAIN, "iat");
+            mIat.setParameter(SpeechConstant.LANGUAGE, "zh_cn");
+            mIat.setParameter(SpeechConstant.ACCENT, "mandarin");
+            String FEMALE_VOICE = "xiaoyan";
+            mIat.setParameter(SpeechConstant.VOICE_NAME, FEMALE_VOICE);
+        } else {
+            Log.e("BottomFragment", "Failed to create SpeechRecognizer.");
+        }
     }
+
+    private class MyInitListener implements InitListener {
+        @Override
+        public void onInit(int code) {
+            if (code != ErrorCode.SUCCESS) {
+                Log.e("BottomFragment", "Initialization of SpeechRecognizer failed, error code: " + code);
+            } else {
+                Log.d("BottomFragment", "Initialization of SpeechRecognizer succeeded.");
+            }
+        }
+    }
+
+
 
     private static final int RECORD_AUDIO_REQUEST_CODE = 101;
 
@@ -108,7 +144,7 @@ public class BottomFragment extends Fragment {
 
                     txtListening.setVisibility(View.VISIBLE);
                     speechOutput.setVisibility(View.VISIBLE);
-                    if(txtSpeechResult != null) {
+                    if (txtSpeechResult != null) {
                         txtSpeechResult.setText(recognizedText);
                     }
 
@@ -125,6 +161,7 @@ public class BottomFragment extends Fragment {
                         mIat.startListening(mRecognizerListener);
                     } else {
                         Log.e("BottomFragment", "SpeechRecognizer is null during touch event.");
+                        return false;
                     }
 
                     return true;
@@ -149,7 +186,7 @@ public class BottomFragment extends Fragment {
                     } else {
                         Log.e("BottomFragment", "SpeechRecognizer is null during touch event.");
                     }
-                    if(txtSpeechResult != null) {
+                    if (txtSpeechResult != null) {
                         txtSpeechResult.setText(recognizedText);
                     }
                     return true;
@@ -226,6 +263,7 @@ public class BottomFragment extends Fragment {
 
         // ... [其他的RecognizerListener方法]
     };
+
     private String parseResult(String json) {
         StringBuilder ret = new StringBuilder();
         try {
@@ -242,6 +280,7 @@ public class BottomFragment extends Fragment {
         }
         return ret.toString();
     }
+
     @Override
     public void onPause() {
         super.onPause();
