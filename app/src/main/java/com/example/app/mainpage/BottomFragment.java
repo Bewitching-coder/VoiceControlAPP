@@ -171,21 +171,21 @@ public class BottomFragment extends Fragment {
                     txtOpening.setVisibility(View.VISIBLE);
                     sayAnimation.setVisibility(View.GONE);
 
-                    txtListening.setVisibility(View.GONE);
-                    speechOutput.setVisibility(View.VISIBLE);
-
-
                     animationView.cancelAnimation();
                     animationView.setScaleX(1f);
                     animationView.setScaleY(1f);
                     animationView.setAnimation(R.raw.opening);
                     animationView.playAnimation();
 
-                    if (mIat != null) {
+                    // 仅当mIat不为空时，我们才停止监听
+                    if (mIat != null && mIat.isListening()) {
                         mIat.stopListening();
                     } else {
-                        Log.e("BottomFragment", "SpeechRecognizer is null during touch event.");
+                        Log.e("BottomFragment", "SpeechRecognizer is null or not running during touch event.");
                     }
+
+
+                    // 重新设置txtSpeechResult的文本
                     if (txtSpeechResult != null) {
                         txtSpeechResult.setText(recognizedText);
                     }
@@ -288,7 +288,7 @@ public class BottomFragment extends Fragment {
     public void onPause() {
         super.onPause();
         try {
-            if (mIat != null) {
+            if (mIat != null && mIat.isListening()) {
                 mIat.stopListening();
             }
         } catch (Exception e) {
@@ -300,7 +300,7 @@ public class BottomFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         try {
-            if (mIat != null) {
+            if (mIat != null && mIat.isListening()) {
                 mIat.stopListening();
                 mIat.destroy();
             }
@@ -308,4 +308,5 @@ public class BottomFragment extends Fragment {
             Log.e("BottomFragment", "Error in onDestroy: " + e.toString());
         }
     }
+
 }
