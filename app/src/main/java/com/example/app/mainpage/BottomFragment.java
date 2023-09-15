@@ -232,31 +232,34 @@ public class BottomFragment extends Fragment {
                     txtSpeechResult.setText(recognizedText);
                 });
             }
+
         }
 
         @Override
-        public void onVolumeChanged(int i, byte[] bytes) {
-
+        public void onVolumeChanged(int volume, byte[] data) {
+            Log.d("RecognizerListener", "onVolumeChanged: volume = " + volume);
         }
 
         @Override
         public void onBeginOfSpeech() {
-
+            Log.d("RecognizerListener", "onBeginOfSpeech");
         }
 
         @Override
         public void onEndOfSpeech() {
-
+            Log.d("RecognizerListener", "onEndOfSpeech");
         }
 
         @Override
         public void onError(SpeechError speechError) {
             Log.d("SpeechRecognition", "Error: " + speechError.getPlainDescription(true));
+            Log.e("RecognizerListener", "Error occurred: " + speechError.getPlainDescription(true));
+
         }
 
         @Override
-        public void onEvent(int i, int i1, int i2, Bundle bundle) {
-
+        public void onEvent(int eventType, int arg1, int arg2, Bundle obj) {
+            Log.d("RecognizerListener", "onEvent: eventType = " + eventType);
         }
 
         // 其他需要实现的方法，如onVolumeChanged, onEndOfSpeech等
