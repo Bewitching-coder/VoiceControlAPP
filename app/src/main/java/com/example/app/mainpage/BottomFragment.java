@@ -41,6 +41,8 @@ public class BottomFragment extends Fragment {
     private SpeechRecognizer mIat;  // 使用讯飞的语音识别类
     private String recognizedText = "";
     private final String MALE_VOICE = "aisjiuxu";
+    private StringBuilder recognizedStringBuilder = new StringBuilder();
+
 
 
     @Override
@@ -155,6 +157,7 @@ public class BottomFragment extends Fragment {
                     animationView.setAnimation(R.raw.listening);
                     animationView.playAnimation();
                     rippleAnimation.playAnimation();
+                    recognizedStringBuilder.setLength(0);
 
                     // Start the voice recognition here
                     if (mIat != null) {
@@ -221,19 +224,22 @@ public class BottomFragment extends Fragment {
         public void onResult(RecognizerResult recognizerResult, boolean isLast) {
             if (recognizerResult != null) {
                 String jsonResult = recognizerResult.getResultString();
-                recognizedText = parseResult(jsonResult);
+                String partialText = parseResult(jsonResult);
+
+                // 添加这个部分的文本到StringBuilder中
+                recognizedStringBuilder.append(partialText);
 
                 // 添加Log以查看解析结果
-                Log.d("RecognizerListener", "Parsed text: " + recognizedText);
+                Log.d("RecognizerListener", "Parsed text: " + recognizedStringBuilder.toString());
 
                 // 更新UI
                 requireActivity().runOnUiThread(() -> {
                     TextView txtSpeechResult = requireView().findViewById(R.id.txt_speech_result);
-                    txtSpeechResult.setText(recognizedText);
+                    txtSpeechResult.setText(recognizedStringBuilder.toString());
                 });
             }
-
         }
+
 
         @Override
         public void onVolumeChanged(int volume, byte[] data) {
