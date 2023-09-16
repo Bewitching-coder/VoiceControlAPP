@@ -63,26 +63,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void sendMessageToAlime(String messageContent) {
-        AlimeHelper.sendMessageToAlime(messageContent, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-                // 处理请求失败的逻辑
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String responseStr = response.body().string();
-                    // 处理返回的数据
-                } else {
-                    // 处理请求失败的逻辑
-                }
-            }
-        });
-    }
-
 
     private void checkAndRequestPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {

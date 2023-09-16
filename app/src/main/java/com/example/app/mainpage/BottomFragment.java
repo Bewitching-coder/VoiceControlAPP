@@ -19,6 +19,8 @@ import androidx.fragment.app.Fragment;
 import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
 import com.example.app.R;
+import com.example.app.settingpage.SettingActivity;
+import com.google.gson.Gson;
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.RecognizerListener;
@@ -36,6 +38,13 @@ import androidx.core.content.ContextCompat;
 
 import android.widget.Toast;
 import android.Manifest;
+
+import okhttp3.Call;
+import utils.AlimeHelper;
+import okhttp3.Callback;
+import okhttp3.Response;
+import java.io.IOException;
+
 
 public class BottomFragment extends Fragment {
     private SpeechRecognizer mIat;  // 使用讯飞的语音识别类
@@ -225,6 +234,10 @@ public class BottomFragment extends Fragment {
             if (recognizerResult != null) {
                 String jsonResult = recognizerResult.getResultString();
                 String partialText = parseResult(jsonResult);
+                if (isLast) {
+                    // 识别结束，传递文字给AliMe
+                    sendTextToAlime(recognizedStringBuilder.toString());
+                }
 
                 // 添加这个部分的文本到StringBuilder中
                 recognizedStringBuilder.append(partialText);
@@ -239,6 +252,38 @@ public class BottomFragment extends Fragment {
                 });
             }
         }
+
+        private void sendTextToAlime(String recognizedText) {
+            String autobiography = "你假装是一个律师跟我说话";
+            AlimeHelper.sendMessageToAlime(recognizedText, autobiography, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    e.printStackTrace();
+                    // 处理请求失败的逻辑
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    if (response.isSuccessful()) {
+                        String responseStr = response.body().string();
+                        // 使用Gson解析响应，你可能需要添加Gson的import声明
+                        SettingActivity.AlimeResponse alimeResponse = new Gson().fromJson(responseStr, SettingActivity.AlimeResponse.class);
+                        String alimeReply = alimeResponse.getData().getText();
+
+                        // 将 Alime 的回复追加到 recognizedStringBuilder 并更新 UI
+                        recognizedStringBuilder.append("\nAliMe: ").append(alimeReply);
+
+                        requireActivity().runOnUiThread(() -> {
+                            TextView txtSpeechResult = requireView().findViewById(R.id.txt_speech_result);
+                            txtSpeechResult.setText(recognizedStringBuilder.toString());
+                        });
+                    } else {
+                        // 处理请求失败的逻辑
+                    }
+                }
+            });
+        }
+
 
 
         @Override

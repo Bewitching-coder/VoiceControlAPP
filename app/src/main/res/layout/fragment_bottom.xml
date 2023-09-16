@@ -11,8 +11,8 @@
 
     <FrameLayout
         android:id="@+id/speech_output"
-        android:layout_width="350dp"
-        android:layout_height="130dp"
+        android:layout_width="400dp"
+        android:layout_height="200dp"
         android:layout_marginBottom="80dp"
         android:background="@drawable/rounded_corner"
         android:padding="16dp"
