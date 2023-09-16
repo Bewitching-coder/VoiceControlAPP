@@ -241,24 +241,26 @@ public class BottomFragment extends Fragment {
             if (recognizerResult != null) {
                 String jsonResult = recognizerResult.getResultString();
                 String partialText = parseResult(jsonResult);
-                if (isLast) {
-                    // 识别结束，传递文字给AliMe
-                    sendTextToAlime(recognizedStringBuilder.toString());
-                }
-
-                // 添加这个部分的文本到StringBuilder中
                 recognizedStringBuilder.append(partialText);
 
-                // 添加Log以查看解析结果
+                if (isLast) {
+                    String fullRecognizedText = recognizedStringBuilder.toString();
+                    if (fullRecognizedText.startsWith("打开")) {
+                        handleVoiceCommand(fullRecognizedText); // 如果指令是 "打开..." 则尝试启动对应应用
+                    } else {
+                        sendTextToAlime(fullRecognizedText); // 其他情况发送给AliMe
+                    }
+                }
+
                 Log.d("RecognizerListener", "Parsed text: " + recognizedStringBuilder.toString());
 
-                // 更新UI
                 requireActivity().runOnUiThread(() -> {
                     TextView txtSpeechResult = requireView().findViewById(R.id.txt_speech_result);
                     txtSpeechResult.setText(recognizedStringBuilder.toString());
                 });
             }
         }
+
 
         private void sendTextToAlime(String recognizedText) {
             String autobiography = "你假装是一个律师跟我说话";
@@ -368,7 +370,6 @@ public class BottomFragment extends Fragment {
     }
 
     private Map<String, String> appNameToPackageMap = new HashMap<>();
-
     private void loadInstalledApps() {
         PackageManager pm = getActivity().getPackageManager();
         List<ApplicationInfo> apps = pm.getInstalledApplications(0);
@@ -376,15 +377,23 @@ public class BottomFragment extends Fragment {
         for (ApplicationInfo app : apps) {
             String appName = pm.getApplicationLabel(app).toString();
             String packageName = app.packageName;
-            appNameToPackageMap.put(appName, packageName);
+            appNameToPackageMap.put(normalizeString(appName), packageName);
+            Log.d("BottomFragment", "Normalized Name: " + normalizeString(appName) + ", Loaded App: " + appName + " with Package: " + packageName);
+            Log.d("BottomFragment", "Loaded App: " + appName + " with Package: " + packageName);
         }
     }
 
     private void handleVoiceCommand(String command) {
+        Log.d("BottomFragment", "Received Voice Command: " + command);
         if (command.startsWith("打开")) {
             String appName = command.substring(2).trim(); // 从"打开"后面获取应用名
-            String packageName = appNameToPackageMap.get(appName);
+            String normalizedAppName = normalizeString(appName);
+            Log.d("BottomFragment", "Normalized App Name from Voice Command: " + normalizedAppName);
+            String packageName = appNameToPackageMap.get(normalizedAppName);
+            Log.d("BottomFragment", "Extracted App Name from Voice Command: " + appName);
+
             if (packageName != null) {
+                Log.d("BottomFragment", "Attempting to launch: " + packageName);
                 launchAppByPackageName(packageName);
             } else {
                 Toast.makeText(getActivity(), "未识别或未安装的应用", Toast.LENGTH_SHORT).show();
@@ -393,6 +402,7 @@ public class BottomFragment extends Fragment {
             // 对于其他非“打开”开头的指令，如需要可以发送给alime
         }
     }
+
     private void launchAppByPackageName(String packageName) {
         try {
             Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage(packageName);
@@ -405,6 +415,10 @@ public class BottomFragment extends Fragment {
             Log.e("BottomFragment", "Error in launching app: " + e.toString());
             Toast.makeText(getActivity(), "启动应用时出错", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private String normalizeString(String input) {
+        return input.toLowerCase().replace(" ", "").replace("。", "");
     }
 
 
