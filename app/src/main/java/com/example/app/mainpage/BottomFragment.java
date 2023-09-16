@@ -1,6 +1,8 @@
 package com.example.app.mainpage;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,6 +46,9 @@ import utils.AlimeHelper;
 import okhttp3.Callback;
 import okhttp3.Response;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class BottomFragment extends Fragment {
@@ -58,7 +63,9 @@ public class BottomFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d("BottomFragment", "onCreateView called.");
         View view = inflater.inflate(R.layout.fragment_bottom, container, false);
+        loadInstalledApps();
         return view;
+
     }
 
     @Override
@@ -359,5 +366,47 @@ public class BottomFragment extends Fragment {
             Log.e("BottomFragment", "Error in onDestroy: " + e.toString());
         }
     }
+
+    private Map<String, String> appNameToPackageMap = new HashMap<>();
+
+    private void loadInstalledApps() {
+        PackageManager pm = getActivity().getPackageManager();
+        List<ApplicationInfo> apps = pm.getInstalledApplications(0);
+
+        for (ApplicationInfo app : apps) {
+            String appName = pm.getApplicationLabel(app).toString();
+            String packageName = app.packageName;
+            appNameToPackageMap.put(appName, packageName);
+        }
+    }
+
+    private void handleVoiceCommand(String command) {
+        if (command.startsWith("打开")) {
+            String appName = command.substring(2).trim(); // 从"打开"后面获取应用名
+            String packageName = appNameToPackageMap.get(appName);
+            if (packageName != null) {
+                launchAppByPackageName(packageName);
+            } else {
+                Toast.makeText(getActivity(), "未识别或未安装的应用", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            // 对于其他非“打开”开头的指令，如需要可以发送给alime
+        }
+    }
+    private void launchAppByPackageName(String packageName) {
+        try {
+            Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage(packageName);
+            if (intent != null) {
+                startActivity(intent);
+            } else {
+                Toast.makeText(getActivity(), "无法启动应用", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Log.e("BottomFragment", "Error in launching app: " + e.toString());
+            Toast.makeText(getActivity(), "启动应用时出错", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
 
 }
