@@ -30,7 +30,10 @@ import com.iflytek.cloud.RecognizerResult;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
+import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SpeechUtility;
+import com.iflytek.cloud.SynthesizerListener;
+
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -57,7 +60,7 @@ public class BottomFragment extends Fragment {
     private final String MALE_VOICE = "aisjiuxu";
     private StringBuilder recognizedStringBuilder = new StringBuilder();
 
-
+    private SpeechSynthesizer mTts;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -73,6 +76,7 @@ public class BottomFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         Log.d("BottomFragment", "onActivityCreated called.");
         initSpeechRecognizer();
+        initSpeechSynthesizer();  // 初始化语音合成
     }
 
     @Override
@@ -278,6 +282,7 @@ public class BottomFragment extends Fragment {
                         // 使用Gson解析响应，你可能需要添加Gson的import声明
                         SettingActivity.AlimeResponse alimeResponse = new Gson().fromJson(responseStr, SettingActivity.AlimeResponse.class);
                         String alimeReply = alimeResponse.getData().getText();
+                        speakOutLoud(alimeReply);  // 使用语音合成播报Alime的回答
 
                         // 将 Alime 的回复追加到 recognizedStringBuilder 并更新 UI
                         recognizedStringBuilder.append("\nAliMe: ").append(alimeReply);
@@ -419,6 +424,63 @@ public class BottomFragment extends Fragment {
 
     private String normalizeString(String input) {
         return input.toLowerCase().replace(" ", "").replace("。", "");
+    }
+    private void initSpeechSynthesizer() {
+        Log.d("BottomFragment", "Initializing SpeechSynthesizer.");
+        mTts = SpeechSynthesizer.createSynthesizer(getContext(), new MyInitListener());
+
+        if (mTts != null) {
+            mTts.setParameter(SpeechConstant.VOICE_NAME, MALE_VOICE);
+            mTts.setParameter(SpeechConstant.SPEED, "50");
+            mTts.setParameter(SpeechConstant.VOLUME, "80");
+            mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD);
+        } else {
+            Log.e("BottomFragment", "Failed to create SpeechSynthesizer.");
+        }
+    }
+
+    private void speakOutLoud(String text) {
+        if (mTts != null) {
+            mTts.startSpeaking(text, new MySynthesizerListener());
+        } else {
+            Log.e("BottomFragment", "SpeechSynthesizer is null during speak.");
+        }
+    }
+    private class MySynthesizerListener implements SynthesizerListener {
+        @Override
+        public void onSpeakBegin() {
+            // ...
+        }
+
+        @Override
+        public void onBufferProgress(int percent, int beginPos, int endPos, String info) {
+            // ...
+        }
+
+        @Override
+        public void onSpeakPaused() {
+            // ...
+        }
+
+        @Override
+        public void onSpeakResumed() {
+            // ...
+        }
+
+        @Override
+        public void onSpeakProgress(int percent, int beginPos, int endPos) {
+            // ...
+        }
+
+        @Override
+        public void onCompleted(SpeechError error) {
+            // ...
+        }
+
+        @Override
+        public void onEvent(int eventType, int arg1, int arg2, Bundle obj2) {
+            // 你的实现代码...
+        }
     }
 
 
