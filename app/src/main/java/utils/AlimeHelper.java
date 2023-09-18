@@ -15,7 +15,7 @@ public class AlimeHelper {
                 .url("https://bjcn-api.apusai.com/ai/chat/")
                 .post(requestBody)
                 .addHeader("Content-Type", "application/json")
-                .addHeader("X-Auth-Key", "ShznkDwvIcsrhUNT1BeGs8gT0mjZR5XIrSquWpfsjvLMwhvW")
+                .addHeader("X-Auth-Key", "2Jej9Jb4mPLwGoVunVhmnbhDqgn3qu9goZF8qEyACEu9nMnO")
                 .build();
 
         client.newCall(request).enqueue(callback);

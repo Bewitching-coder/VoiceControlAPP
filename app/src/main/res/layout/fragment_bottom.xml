@@ -21,15 +21,24 @@
         app:layout_constraintEnd_toEndOf="@id/animation_view"
         app:layout_constraintStart_toStartOf="@id/animation_view">
 
-        <TextView
-            android:id="@+id/txt_speech_result"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            style="@style/VoiceInputTextStyle" />
+            android:fillViewport="true"
+            android:clipToPadding="false">
+
+            <TextView
+                android:id="@+id/txt_speech_result"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                style="@style/VoiceInputTextStyle" />
+
+        </ScrollView>
 
     </FrameLayout>
+
 
     <!-- Initial state animation -->
     <com.airbnb.lottie.LottieAnimationView

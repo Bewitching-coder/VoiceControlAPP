@@ -287,21 +287,30 @@ public class BottomFragment extends Fragment {
                 public void onResponse(Call call, Response response) throws IOException {
                     if (response.isSuccessful()) {
                         String responseStr = response.body().string();
-                        // 使用Gson解析响应，你可能需要添加Gson的import声明
+                        Log.d("BottomFragment", "Server Response: " + responseStr);
+
+                        // 使用Gson解析响应
                         SettingActivity.AlimeResponse alimeResponse = new Gson().fromJson(responseStr, SettingActivity.AlimeResponse.class);
-                        String alimeReply = alimeResponse.getData().getText();
-                        speakOutLoud(alimeReply);  // 使用语音合成播报Alime的回答
 
-                        // 将 Alime 的回复追加到 recognizedStringBuilder 并更新 UI
-                        recognizedStringBuilder.append("\nAliMe: ").append(alimeReply);
+                        if (alimeResponse != null && alimeResponse.getData() != null) {
+                            String alimeReply = alimeResponse.getData().getText();
+                            speakOutLoud(alimeReply);  // 使用语音合成播报Alime的回答
 
-                        requireActivity().runOnUiThread(() -> {
-                            TextView txtSpeechResult = requireView().findViewById(R.id.txt_speech_result);
-                            txtSpeechResult.setText(recognizedStringBuilder.toString());
-                        });
+                            // 将 Alime 的回复追加到 recognizedStringBuilder 并更新 UI
+                            recognizedStringBuilder.append("\nAliMe: ").append(alimeReply);
+
+                            requireActivity().runOnUiThread(() -> {
+                                TextView txtSpeechResult = requireView().findViewById(R.id.txt_speech_result);
+                                txtSpeechResult.setText(recognizedStringBuilder.toString());
+                            });
+                        } else {
+                            // 你可能想在这里添加一些错误处理代码，例如日志记录或UI提示
+                            Log.e("BottomFragment", "alimeResponse or alimeResponse.getData() is null.");
+                        }
                     } else {
                         // 处理请求失败的逻辑
                     }
+
                 }
             });
         }
