@@ -1,10 +1,12 @@
 package com.example.app.settingpage;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.app.R;
@@ -50,7 +52,18 @@ public class SettingActivity extends Activity {
                 finish();
             }
         });
+        // In SettingActivity's onCreate method
+        LinearLayout btnVoiceRecognitionSettings = findViewById(R.id.btn_voice_recognition_settings);
+        btnVoiceRecognitionSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SettingActivity.this, VoiceRecognitionSettingsActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
+
 
     private void sendMessageToAlime(String messageContent, final TextView responseTextView) {
         OkHttpClient client = new OkHttpClient();

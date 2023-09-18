@@ -22,5 +22,8 @@
     <string name="software_version">软件版本</string>
     <string name="version_number">1.0.7</string>
     <string name="back_button_description">返回</string>
-
+    <string name="hint_enter_keyword">输入关键词</string>
+    <string name="hint_enter_url">输入网址</string>
+    <string name="save">保存</string>
+    <string name="voice_recognition_instruction">在此页面上，您可以设置自定义的关键词和对应的网址。当您通过语音命令提及这些关键词时，系统会自动打开对应的网址。例如，设定关键词"百度"对应网址为"www.baidu.com"，之后只需说"浏览百度"，系统就会为您打开百度网站。</string>
 </resources>

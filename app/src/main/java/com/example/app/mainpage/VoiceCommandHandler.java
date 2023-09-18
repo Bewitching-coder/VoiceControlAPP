@@ -1,6 +1,7 @@
 package com.example.app.mainpage;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import java.util.HashMap;
@@ -16,6 +17,15 @@ public class VoiceCommandHandler {
 
     public VoiceCommandHandler(Context context) {
         this.mContext = context;
+        updateUrlMapFromPreferences();
+    }
+    private void updateUrlMapFromPreferences() {
+        SharedPreferences sharedPref = mContext.getSharedPreferences("voice_commands", Context.MODE_PRIVATE);
+        Map<String, ?> keys = sharedPref.getAll();
+
+        for (Map.Entry<String, ?> entry : keys.entrySet()) {
+            URL_MAP.put(entry.getKey(), entry.getValue().toString());
+        }
     }
 
     private static final Map<String, String> URL_MAP = new HashMap<>();

@@ -417,7 +417,7 @@ public class BottomFragment extends Fragment {
             }
         } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setMessage("输入的格式不正确，请重新输入")
+            builder.setMessage("输入的格式不正确，请重新输入，您可以说浏览/我想看/在浏览器中展示 某某某网站")
                     .setPositiveButton("确定", null)
                     .create()
                     .show();

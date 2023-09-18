@@ -88,7 +88,7 @@
 
     <!-- Privacy Agreement -->
     <LinearLayout
-        android:id="@+id/btn_privacy"
+        android:id="@+id/btn_voice_recognition_settings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?android:attr/selectableItemBackground"
