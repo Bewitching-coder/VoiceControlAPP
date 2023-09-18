@@ -1,6 +1,7 @@
 package com.example.app.mainpage;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -77,6 +78,8 @@ public class BottomFragment extends Fragment {
         Log.d("BottomFragment", "onActivityCreated called.");
         initSpeechRecognizer();
         initSpeechSynthesizer();  // 初始化语音合成
+        mVoiceCommandHandler = new VoiceCommandHandler(getActivity());
+
     }
 
     @Override
@@ -249,7 +252,10 @@ public class BottomFragment extends Fragment {
 
                 if (isLast) {
                     String fullRecognizedText = recognizedStringBuilder.toString();
-                    if (fullRecognizedText.startsWith("打开")) {
+                    if (fullRecognizedText.startsWith("打开") ||
+                            fullRecognizedText.startsWith("浏览") ||
+                            fullRecognizedText.startsWith("我想看") ||
+                            fullRecognizedText.startsWith("在浏览器中展示"))  {
                         handleVoiceCommand(fullRecognizedText); // 如果指令是 "打开..." 则尝试启动对应应用
                     } else {
                         sendTextToAlime(fullRecognizedText); // 其他情况发送给AliMe
@@ -390,7 +396,11 @@ public class BottomFragment extends Fragment {
 
     private void handleVoiceCommand(String command) {
         Log.d("BottomFragment", "Received Voice Command: " + command);
-        if (command.startsWith("打开")) {
+        String parsedSite = mVoiceCommandHandler.processVoiceCommand(command);
+        if (parsedSite != null) {
+            // 使用TTS功能（或其他你用于语音播报的工具）播报
+            speakOutLoud("正在为您打开" + parsedSite);
+        } else if (command.startsWith("打开")) {
             String appName = command.substring(2).trim(); // 从"打开"后面获取应用名
             String normalizedAppName = normalizeString(appName);
             Log.d("BottomFragment", "Normalized App Name from Voice Command: " + normalizedAppName);
@@ -398,13 +408,17 @@ public class BottomFragment extends Fragment {
             Log.d("BottomFragment", "Extracted App Name from Voice Command: " + appName);
 
             if (packageName != null) {
-                Log.d("BottomFragment", "Attempting to launch: " + packageName);
-                launchAppByPackageName(packageName);
+                Log.d("BottomFragment", "Preparing to launch: " + packageName);
+                speakAndLaunchApp("正在为您打开" + appName, packageName);  // 添加packageName作为参数
             } else {
                 Toast.makeText(getActivity(), "未识别或未安装的应用", Toast.LENGTH_SHORT).show();
             }
         } else {
-            // 对于其他非“打开”开头的指令，如需要可以发送给alime
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage("输入的格式不正确，请重新输入")
+                    .setPositiveButton("确定", null)
+                    .create()
+                    .show();
         }
     }
 
@@ -441,12 +455,26 @@ public class BottomFragment extends Fragment {
 
     private void speakOutLoud(String text) {
         if (mTts != null) {
-            mTts.startSpeaking(text, new MySynthesizerListener());
+            mTts.startSpeaking(text, new MySynthesizerListener(null));
         } else {
             Log.e("BottomFragment", "SpeechSynthesizer is null during speak.");
         }
     }
+
+    private void speakAndLaunchApp(String text, String packageName) {
+        if (mTts != null) {
+            mTts.startSpeaking(text, new MySynthesizerListener(packageName));
+        } else {
+            Log.e("BottomFragment", "SpeechSynthesizer is null during speak.");
+        }
+    }
+
     private class MySynthesizerListener implements SynthesizerListener {
+        private String mPackageName;
+
+        public MySynthesizerListener(String packageName) {
+            this.mPackageName = packageName;
+        }
         @Override
         public void onSpeakBegin() {
             // ...
@@ -474,7 +502,13 @@ public class BottomFragment extends Fragment {
 
         @Override
         public void onCompleted(SpeechError error) {
-            // ...
+            if (error == null) {
+                // 如果播报完成，并且没有错误，那么启动应用
+                launchAppByPackageName(mPackageName);
+            } else {
+                Log.e("BottomFragment", "Error during speech: " + error.toString());
+                Toast.makeText(getActivity(), "语音播报错误", Toast.LENGTH_SHORT).show();
+            }
         }
 
         @Override
@@ -484,5 +518,5 @@ public class BottomFragment extends Fragment {
     }
 
 
-
+    private VoiceCommandHandler mVoiceCommandHandler;
 }
