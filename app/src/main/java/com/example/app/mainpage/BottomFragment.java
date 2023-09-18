@@ -142,6 +142,8 @@ public class BottomFragment extends Fragment {
         TextView txtOpening = view.findViewById(R.id.txt_opening);
         FrameLayout speechOutput = view.findViewById(R.id.speech_output);
         TextView txtSpeechResult = view.findViewById(R.id.txt_speech_result);
+        txtSpeechResult.setTextAppearance(requireContext(), R.style.VoiceInputTextStyle);
+
 
         rippleAnimation.setAnimation(R.raw.ripple);
         rippleAnimation.setRepeatCount(LottieDrawable.INFINITE);

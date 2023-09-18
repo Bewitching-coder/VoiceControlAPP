@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="VoiceInputTextStyle">
+        <item name="android:textSize">24sp</item> <!-- 更大的字体大小 -->
+        <item name="android:textColor">#FFFFFF</item> <!-- 字体颜色，这里为白色 -->
+        <item name="android:shadowColor">#000000</item> <!-- 阴影颜色，这里为黑色 -->
+        <item name="android:shadowDx">1</item> <!-- 阴影的水平偏移 -->
+        <item name="android:shadowDy">1</item> <!-- 阴影的垂直偏移 -->
+        <item name="android:shadowRadius">2</item> <!-- 阴影的半径 -->
+        <item name="android:gravity">center</item> <!-- 文字在其容器中居中 -->
+        <item name="android:layout_gravity">center</item> <!-- 容器本身在其父布局中居中 -->
+        <item name="android:layout_width">match_parent</item> <!-- 容器的宽度占满其父布局 -->
+        <item name="android:layout_height">wrap_content</item> <!-- 容器的高度根据内容自适应 -->
+    </style>
+
+
+</resources>

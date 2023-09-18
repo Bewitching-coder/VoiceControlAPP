@@ -23,7 +23,7 @@ public class VoiceCommandHandler {
     static {
         URL_MAP.put("百度网站", "www.baidu.com");
         URL_MAP.put("知乎网站", "www.zhihu.com");
-        URL_MAP.put("b站", "www.bilibili.com");
+        URL_MAP.put("哔哩哔哩", "www.bilibili.com");
         // 您可以继续添加其他的...
     }
 
