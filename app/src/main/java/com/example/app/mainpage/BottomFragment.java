@@ -63,6 +63,16 @@ public class BottomFragment extends Fragment {
     private StringBuilder recognizedStringBuilder = new StringBuilder();
 
     private SpeechSynthesizer mTts;
+    private LottieAnimationView animationView;
+    private LottieAnimationView rippleAnimation;
+    private LottieAnimationView sayAnimation;
+    private TextView txtPrompt;
+    private ImageView imgVoice;
+    private FrameLayout speechOutput;
+
+
+// ... 其他相关的元素
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -142,15 +152,16 @@ public class BottomFragment extends Fragment {
             }
         });
 
-        LottieAnimationView animationView = view.findViewById(R.id.animation_view);
-        LottieAnimationView rippleAnimation = view.findViewById(R.id.ripple_animation);
-        LottieAnimationView sayAnimation = view.findViewById(R.id.top_animation);
+        animationView = view.findViewById(R.id.animation_view);
+        rippleAnimation = view.findViewById(R.id.ripple_animation);
+        sayAnimation = view.findViewById(R.id.top_animation);
+        imgVoice = view.findViewById(R.id.img_voice);
+        speechOutput = view.findViewById(R.id.speech_output);
 
-        TextView txtPrompt = view.findViewById(R.id.txt_prompt);
-        ImageView imgVoice = view.findViewById(R.id.img_voice);
+
+        txtPrompt = view.findViewById(R.id.txt_prompt);
         TextView txtListening = view.findViewById(R.id.txt_listening);
         TextView txtOpening = view.findViewById(R.id.txt_opening);
-        FrameLayout speechOutput = view.findViewById(R.id.speech_output);
         TextView txtSpeechResult = view.findViewById(R.id.txt_speech_result);
         txtSpeechResult.setTextAppearance(requireContext(), R.style.VoiceInputTextStyle);
 
@@ -540,4 +551,45 @@ public class BottomFragment extends Fragment {
 
 
     private VoiceCommandHandler mVoiceCommandHandler;
+
+    private void resetUIElements() {
+        // 重置Lottie动画
+        if (animationView != null) {
+            animationView.cancelAnimation();
+            animationView.setAnimation(R.raw.initial_state);
+            animationView.setRepeatCount(LottieDrawable.INFINITE);
+            animationView.playAnimation();
+        }
+
+        if (rippleAnimation != null) {
+            rippleAnimation.cancelAnimation();
+            rippleAnimation.setAnimation(R.raw.ripple);
+            rippleAnimation.setRepeatCount(LottieDrawable.INFINITE);
+            rippleAnimation.playAnimation();
+        }
+
+        // 重置TextView
+        if (txtPrompt != null) {
+            txtPrompt.setVisibility(View.VISIBLE);
+        }
+        if (sayAnimation != null) {
+            sayAnimation.setVisibility(View.VISIBLE);
+            sayAnimation.setAnimation(R.raw.you_can_say);
+            sayAnimation.setRepeatCount(LottieDrawable.INFINITE);
+            sayAnimation.playAnimation();
+        }
+
+        if (imgVoice != null) {
+            imgVoice.setVisibility(View.VISIBLE);
+        }
+
+        // 将speech_output隐藏
+        if (speechOutput != null) {
+            speechOutput.setVisibility(View.GONE);
+        }
+    }
+    public void resetUIFromExternal() {
+        resetUIElements();
+    }
+
 }

@@ -11,6 +11,7 @@
         android:id="@+id/btn_back"
         android:layout_width="36dp"
         android:layout_height="38dp"
+        android:textColor="@color/black"
         android:background="@drawable/ic_back_arrow"
         android:contentDescription="@string/back_button_description"/>
 
@@ -20,6 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/hint_enter_keyword"
+        android:textColor="@color/black"
         android:layout_marginTop="16dp" />
 
     <EditText
@@ -28,6 +30,7 @@
         android:layout_height="wrap_content"
         android:hint="@string/hint_enter_url"
         android:inputType="textUri"
+        android:textColor="@color/black"
         android:layout_marginTop="8dp" />
 
     <Button
@@ -35,6 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/save"
+        android:textColor="@color/black"
         android:layout_marginTop="16dp" />
 
     <!-- User Instruction -->
@@ -42,6 +46,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
+        android:textColor="@color/black"
         android:text="@string/voice_recognition_instruction"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
