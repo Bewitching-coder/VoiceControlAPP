@@ -46,14 +46,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         checkAndRequestPermissions();
 
-
-        // Load the top fragment
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container_top, new TopFragment())
-                    .commit();
-        }
-
         // Load the bottom fragment
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()

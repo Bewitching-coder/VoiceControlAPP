@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -131,6 +132,15 @@ public class BottomFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         requestMicrophonePermission();
+
+        ImageButton btnSettings = view.findViewById(R.id.aboutButton);
+        btnSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), SettingActivity.class);
+                startActivity(intent);
+            }
+        });
 
         LottieAnimationView animationView = view.findViewById(R.id.animation_view);
         LottieAnimationView rippleAnimation = view.findViewById(R.id.ripple_animation);
