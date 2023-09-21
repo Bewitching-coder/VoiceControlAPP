@@ -2,9 +2,12 @@ package com.example.app.mainpage;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,7 +27,9 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
 import com.example.app.R;
 import com.example.app.settingpage.SettingActivity;
+import com.example.app.settingpage.VoiceRecognitionSettingsActivity;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.RecognizerListener;
@@ -50,7 +55,10 @@ import okhttp3.Call;
 import utils.AlimeHelper;
 import okhttp3.Callback;
 import okhttp3.Response;
+
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +82,11 @@ public class BottomFragment extends Fragment {
     private FrameLayout speechOutput;
 
     private List<CustomCommand> commandsList = new ArrayList<>();
+
+    SharedPreferences sharedPreferences;
+    String savedTitle;
+    String savedType;
+    String savedAddress;
 
 
 // ... 其他相关的元素
@@ -151,6 +164,25 @@ public class BottomFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         requestMicrophonePermission();
+
+        // 初始化 SharedPreferences 和获取数据
+        sharedPreferences = getActivity().getSharedPreferences(VoiceRecognitionSettingsActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+
+        // 获取整个命令列表
+        String jsonCommands = sharedPreferences.getString(VoiceRecognitionSettingsActivity.COMMANDS_LIST, "");
+        Type type = new TypeToken<ArrayList<CustomCommand>>(){}.getType();
+        ArrayList<CustomCommand> commands = new Gson().fromJson(jsonCommands, type);
+
+        // 如果需要，您可以从commands列表中提取任何您需要的信息
+        if (commands != null && commands.size() > 0) {
+            CustomCommand firstCommand = commands.get(0);
+            String title = firstCommand.getTitle();
+            int commandType = firstCommand.getType();
+            String address = firstCommand.getKeyWords();
+
+            // ... 使用title, commandType, 和 address
+        }
+
 
         ImageButton btnSettings = view.findViewById(R.id.aboutButton);
         btnSettings.setOnClickListener(new View.OnClickListener() {
@@ -436,21 +468,65 @@ public class BottomFragment extends Fragment {
     }
 
     private void handleVoiceCommand(String command) {
-        Log.d("BottomFragment", "Received Voice Command: " + command);
-        String parsedSite = mVoiceCommandHandler.processVoiceCommand(command);
-        if (parsedSite != null) {
-            // 使用TTS功能（或其他你用于语音播报的工具）播报
-            speakOutLoud("正在为您打开" + parsedSite);
-        } else if (command.startsWith("打开")) {
-            String appName = command.substring(2).trim(); // 从"打开"后面获取应用名
-            String normalizedAppName = normalizeString(appName);
-            Log.d("BottomFragment", "Normalized App Name from Voice Command: " + normalizedAppName);
-            String packageName = appNameToPackageMap.get(normalizedAppName);
-            Log.d("BottomFragment", "Extracted App Name from Voice Command: " + appName);
 
+        if (command.equals(savedTitle)) {
+            switch (savedType) {
+                case "打开网页":
+                    // 打开网页
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(savedAddress));
+                    startActivity(browserIntent);
+                    break;
+
+                case "打开应用":
+                    // 打开应用
+                    try {
+                        Intent launchIntent = getActivity().getPackageManager().getLaunchIntentForPackage(savedAddress);
+                        if (launchIntent != null) {
+                            startActivity(launchIntent);
+                        } else {
+                            Toast.makeText(getActivity(), "应用未安装或未找到", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception e) {
+                        Toast.makeText(getActivity(), "打开应用时出错", Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+
+                case "打开视频":
+                    Intent videoIntent = new Intent(Intent.ACTION_VIEW);
+                    if (savedAddress.startsWith("https://") || savedAddress.startsWith("http://")) {
+                        // 在线视频
+                        videoIntent.setDataAndType(Uri.parse(savedAddress), "video/*");
+                    } else if (savedAddress.startsWith("content://")) {
+                        // 相册路径
+                        videoIntent.setDataAndType(Uri.parse(savedAddress), "video/*");
+                    } else {
+                        // SD卡路径或其他路径
+                        videoIntent.setDataAndType(Uri.fromFile(new File(savedAddress)), "video/*");
+                    }
+                    startActivity(videoIntent);
+                    break;
+
+                default:
+                    Toast.makeText(getActivity(), "不支持的命令类型", Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+
+        // 这里处理其他的命令，比如原始的 "打开应用名" 逻辑
+        if (command.startsWith("打开")) {
+            String appName = command.substring(2).trim();
+            String packageName = appNameToPackageMap.get(appName);
             if (packageName != null) {
-                Log.d("BottomFragment", "Preparing to launch: " + packageName);
-                speakAndLaunchApp("正在为您打开" + appName, packageName);  // 添加packageName作为参数
+                try {
+                    Intent launchIntent = getActivity().getPackageManager().getLaunchIntentForPackage(packageName);
+                    if (launchIntent != null) {
+                        startActivity(launchIntent);
+                    } else {
+                        Toast.makeText(getActivity(), "应用未安装或未找到", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(getActivity(), "打开应用时出错", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 Toast.makeText(getActivity(), "未识别或未安装的应用", Toast.LENGTH_SHORT).show();
             }
@@ -462,6 +538,7 @@ public class BottomFragment extends Fragment {
                     .show();
         }
     }
+
 
     private void launchAppByPackageName(String packageName) {
         try {

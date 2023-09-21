@@ -123,6 +123,14 @@
             android:text="说明：基于您的选择，地址/路径/包名 的输入框将会变更。例如：当选择 '打开应用' 时，输入框将要求您输入应用的包名。"
             android:layout_marginTop="16dp"/>
 
+        <!-- 在布局中适当的位置添加此代码 -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"/>
+
+
     </LinearLayout>
 
 </ScrollView>
