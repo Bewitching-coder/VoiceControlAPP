@@ -45,8 +45,11 @@ public class VoiceRecognitionSettingsActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        // Declare commands before using it
         ArrayList<CustomCommand> commands = loadCommandsFromPrefs();
-        CommandsAdapter commandsAdapter = new CommandsAdapter(commands);
+
+        // Initialize CommandsAdapter once with the correct constructor
+        CommandsAdapter commandsAdapter = new CommandsAdapter(this, commands);
         recyclerView.setAdapter(commandsAdapter);
 
         editTitle = findViewById(R.id.editTitle);
@@ -87,11 +90,12 @@ public class VoiceRecognitionSettingsActivity extends AppCompatActivity {
             Toast.makeText(this, "命令已保存", Toast.LENGTH_SHORT).show();
         });
     }
-
     public class CommandsAdapter extends RecyclerView.Adapter<CommandsAdapter.ViewHolder> {
         private ArrayList<CustomCommand> commands;
+        private Context context;
 
-        public CommandsAdapter(ArrayList<CustomCommand> commands) {
+        public CommandsAdapter(Context context, ArrayList<CustomCommand> commands) {
+            this.context = context;
             this.commands = commands;
         }
 
@@ -104,7 +108,18 @@ public class VoiceRecognitionSettingsActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            holder.txtCommand.setText(commands.get(position).getTitle());
+            CustomCommand command = commands.get(position);
+            holder.txtTitle.setText(command.getTitle());
+            holder.txtCommand.setText(command.getCommand());
+            holder.txtType.setText(getTypeString(command.getType()));  // You should define getTypeString method
+            holder.txtKeywords.setText(command.getKeyWords());
+
+            holder.btnDelete.setOnClickListener(v -> {
+                commands.remove(position);
+                saveCommandsToPrefs(commands);
+                notifyItemRemoved(position);
+                Toast.makeText(context, "命令已删除", Toast.LENGTH_SHORT).show();
+            });
         }
 
         @Override
@@ -113,11 +128,29 @@ public class VoiceRecognitionSettingsActivity extends AppCompatActivity {
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
-            TextView txtCommand;
+            TextView txtTitle, txtCommand, txtType, txtKeywords;
+            Button btnDelete;
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
+                txtTitle = itemView.findViewById(R.id.txt_title);
                 txtCommand = itemView.findViewById(R.id.txt_command);
+                txtType = itemView.findViewById(R.id.txt_type);
+                txtKeywords = itemView.findViewById(R.id.txt_keywords);
+                btnDelete = itemView.findViewById(R.id.btn_delete);
+            }
+        }
+
+        private String getTypeString(int type) {
+            switch (type) {
+                case CustomCommand.TYPE_WEB_PAGE:
+                    return "网页";
+                case CustomCommand.TYPE_APP:
+                    return "应用";
+                case CustomCommand.TYPE_VIDEO:
+                    return "视频";
+                default:
+                    return "未知";
             }
         }
     }
