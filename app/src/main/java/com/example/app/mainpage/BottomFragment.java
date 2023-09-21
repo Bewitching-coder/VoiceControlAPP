@@ -64,6 +64,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.app.settingpage.CustomCommand;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,6 +88,7 @@ public class BottomFragment extends Fragment {
     String savedTitle;
     String savedType;
     String savedAddress;
+    String savedCommand;
 
 
 // ... 其他相关的元素
@@ -97,12 +99,7 @@ public class BottomFragment extends Fragment {
         Log.d("BottomFragment", "onCreateView called.");
         View view = inflater.inflate(R.layout.fragment_bottom, container, false);
         loadInstalledApps();
-        initCommands();
         return view;
-    }
-    private void initCommands() {
-        // Just a sample command for testing. This will be loaded from your settings or storage in a real-world scenario.
-        commandsList.add(new CustomCommand("打开APUS官网", "打开阿帕斯官网", CustomCommand.TYPE_WEB_PAGE, "https://..."));
     }
 
     @Override
@@ -156,7 +153,6 @@ public class BottomFragment extends Fragment {
     }
 
 
-
     private static final int RECORD_AUDIO_REQUEST_CODE = 101;
 
     @SuppressLint("ClickableViewAccessibility")
@@ -167,10 +163,16 @@ public class BottomFragment extends Fragment {
 
         // 初始化 SharedPreferences 和获取数据
         sharedPreferences = getActivity().getSharedPreferences(VoiceRecognitionSettingsActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        savedTitle = sharedPreferences.getString("savedTitleKey", null);
+        savedType = sharedPreferences.getString("savedTypeKey", null);
+        savedAddress = sharedPreferences.getString("savedAddressKey", null);
+        savedCommand = sharedPreferences.getString("savedCommandKey", null);
+
 
         // 获取整个命令列表
         String jsonCommands = sharedPreferences.getString(VoiceRecognitionSettingsActivity.COMMANDS_LIST, "");
-        Type type = new TypeToken<ArrayList<CustomCommand>>(){}.getType();
+        Type type = new TypeToken<ArrayList<CustomCommand>>() {
+        }.getType();
         ArrayList<CustomCommand> commands = new Gson().fromJson(jsonCommands, type);
 
         // 如果需要，您可以从commands列表中提取任何您需要的信息
@@ -319,7 +321,7 @@ public class BottomFragment extends Fragment {
                     if (fullRecognizedText.startsWith("打开") ||
                             fullRecognizedText.startsWith("浏览") ||
                             fullRecognizedText.startsWith("我想看") ||
-                            fullRecognizedText.startsWith("在浏览器中展示"))  {
+                            fullRecognizedText.startsWith("在浏览器中展示")) {
                         handleVoiceCommand(fullRecognizedText); // 如果指令是 "打开..." 则尝试启动对应应用
                     } else {
                         sendTextToAlime(fullRecognizedText); // 其他情况发送给AliMe
@@ -454,6 +456,7 @@ public class BottomFragment extends Fragment {
     }
 
     private Map<String, String> appNameToPackageMap = new HashMap<>();
+
     private void loadInstalledApps() {
         PackageManager pm = getActivity().getPackageManager();
         List<ApplicationInfo> apps = pm.getInstalledApplications(0);
@@ -468,8 +471,16 @@ public class BottomFragment extends Fragment {
     }
 
     private void handleVoiceCommand(String command) {
-
-        if (command.equals(savedTitle)) {
+        Log.d("VoiceCommand", "Received command: " + command);
+        command = command.replaceAll("[^a-zA-Z0-9\u4e00-\u9fa5]", "");
+        Log.d("VoiceCommand", "Cleaned command: " + command);
+        CustomCommand customCommand = new CustomCommand();
+        String savedCommand = customCommand.loadCommandFromSharedPreferences(getActivity());
+        Log.d("VoiceCommand", "savedCommand: " + savedCommand);
+        String savedType = Integer.toString(customCommand.loadTypeFromSharedPreferences(getActivity()));
+        Log.d("VoiceCommand", "Saved type: " + savedType);
+        if (command != null && savedCommand != null && command.equals(savedCommand)) {
+            Log.d("VoiceCommand", "Saved type: " + savedType);
             switch (savedType) {
                 case "打开网页":
                     // 打开网页
@@ -515,19 +526,25 @@ public class BottomFragment extends Fragment {
         // 这里处理其他的命令，比如原始的 "打开应用名" 逻辑
         if (command.startsWith("打开")) {
             String appName = command.substring(2).trim();
+            appName = appName.replaceAll("[^a-zA-Z0-9\u4e00-\u9fa5]", "");
+            Log.d("VoiceCommand", "Extracted app name: " + appName);
             String packageName = appNameToPackageMap.get(appName);
+            Log.d("VoiceCommand", "Mapped package name: " + packageName);
             if (packageName != null) {
                 try {
                     Intent launchIntent = getActivity().getPackageManager().getLaunchIntentForPackage(packageName);
                     if (launchIntent != null) {
                         startActivity(launchIntent);
                     } else {
+                        Log.e("VoiceCommand", "Launch intent is null for package: " + packageName);
                         Toast.makeText(getActivity(), "应用未安装或未找到", Toast.LENGTH_SHORT).show();
                     }
                 } catch (Exception e) {
+                    Log.e("VoiceCommand", "Error while opening app", e);
                     Toast.makeText(getActivity(), "打开应用时出错", Toast.LENGTH_SHORT).show();
                 }
             } else {
+                Log.e("VoiceCommand", "No package mapped for app name: " + appName);
                 Toast.makeText(getActivity(), "未识别或未安装的应用", Toast.LENGTH_SHORT).show();
             }
         } else {
@@ -538,7 +555,6 @@ public class BottomFragment extends Fragment {
                     .show();
         }
     }
-
 
     private void launchAppByPackageName(String packageName) {
         try {
@@ -557,6 +573,7 @@ public class BottomFragment extends Fragment {
     private String normalizeString(String input) {
         return input.toLowerCase().replace(" ", "").replace("。", "");
     }
+
     private void initSpeechSynthesizer() {
         Log.d("BottomFragment", "Initializing SpeechSynthesizer.");
         mTts = SpeechSynthesizer.createSynthesizer(getContext(), new MyInitListener());
@@ -593,6 +610,7 @@ public class BottomFragment extends Fragment {
         public MySynthesizerListener(String packageName) {
             this.mPackageName = packageName;
         }
+
         @Override
         public void onSpeakBegin() {
             // ...
@@ -674,9 +692,11 @@ public class BottomFragment extends Fragment {
             speechOutput.setVisibility(View.GONE);
         }
     }
+
     public void resetUIFromExternal() {
         resetUIElements();
     }
+
     private void handleCustomCommands(String recognizedText) {
         for (CustomCommand cmd : commandsList) {
             if (recognizedText.contains(cmd.getCommand())) {

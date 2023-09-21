@@ -26,6 +26,8 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import com.example.app.AppConstants;
+
 
 public class VoiceRecognitionSettingsActivity extends AppCompatActivity {
     // 定义变量
@@ -41,7 +43,7 @@ public class VoiceRecognitionSettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voice_recognition_settings);
 
-        sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(AppConstants.SHARED_PREFS, MODE_PRIVATE);
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -83,6 +85,8 @@ public class VoiceRecognitionSettingsActivity extends AppCompatActivity {
             String keyWords = editAddress.getText().toString();
 
             CustomCommand newCommand = new CustomCommand(title, command, type, keyWords);
+            newCommand.saveToSharedPreferences(this); // 保存 command 到 SharedPreferences
+            newCommand.saveTypeToSharedPreferences(this); // 保存类型到 SharedPreferences
             commands.add(newCommand);
             saveCommandsToPrefs(commands);
             commandsAdapter.notifyDataSetChanged();

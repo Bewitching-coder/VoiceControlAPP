@@ -1,5 +1,12 @@
 package com.example.app.settingpage;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
+
+import com.example.app.AppConstants;
+
+
 public class CustomCommand {
 
     public static final int TYPE_WEB_PAGE = 1;
@@ -17,6 +24,8 @@ public class CustomCommand {
         this.command = command;
         this.type = type;
         this.keyWords = keyWords;
+    }
+    public CustomCommand() {
     }
 
     // Getters
@@ -52,4 +61,41 @@ public class CustomCommand {
     public void setKeyWords(String keyWords) {
         this.keyWords = keyWords;
     }
+    public void saveToSharedPreferences(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(AppConstants.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(AppConstants.COMMAND_KEY, command);
+        editor.apply();
+    }
+
+    public String loadCommandFromSharedPreferences(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(AppConstants.SHARED_PREFS, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(AppConstants.COMMAND_KEY, command);
+    }
+    public void saveTypeToSharedPreferences(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(AppConstants.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(AppConstants.TYPE_KEY, type);
+        editor.apply();
+    }
+
+    public int loadTypeFromSharedPreferences(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(AppConstants.SHARED_PREFS, Context.MODE_PRIVATE);
+        return sharedPreferences.getInt(AppConstants.TYPE_KEY, type);
+    }
+
+
+    public void saveKeywordsToSharedPreferences(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(AppConstants.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(AppConstants.KEYWORDS_KEY, keyWords);
+        editor.apply();
+    }
+
+    public String loadKeywordsFromSharedPreferences(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(AppConstants.SHARED_PREFS, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(AppConstants.KEYWORDS_KEY, null);
+    }
+
+
 }
