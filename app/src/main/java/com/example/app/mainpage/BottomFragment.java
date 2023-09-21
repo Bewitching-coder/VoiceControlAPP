@@ -55,6 +55,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.example.app.settingpage.CustomCommand;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BottomFragment extends Fragment {
     private SpeechRecognizer mIat;  // 使用讯飞的语音识别类
@@ -70,6 +73,8 @@ public class BottomFragment extends Fragment {
     private ImageView imgVoice;
     private FrameLayout speechOutput;
 
+    private List<CustomCommand> commandsList = new ArrayList<>();
+
 
 // ... 其他相关的元素
 
@@ -79,8 +84,12 @@ public class BottomFragment extends Fragment {
         Log.d("BottomFragment", "onCreateView called.");
         View view = inflater.inflate(R.layout.fragment_bottom, container, false);
         loadInstalledApps();
+        initCommands();
         return view;
-
+    }
+    private void initCommands() {
+        // Just a sample command for testing. This will be loaded from your settings or storage in a real-world scenario.
+        commandsList.add(new CustomCommand("打开APUS官网", "打开阿帕斯官网", CustomCommand.TYPE_WEB_PAGE, "https://..."));
     }
 
     @Override
@@ -283,6 +292,8 @@ public class BottomFragment extends Fragment {
                     } else {
                         sendTextToAlime(fullRecognizedText); // 其他情况发送给AliMe
                     }
+
+                    handleCustomCommands(fullRecognizedText);
                 }
 
                 Log.d("RecognizerListener", "Parsed text: " + recognizedStringBuilder.toString());
@@ -292,6 +303,12 @@ public class BottomFragment extends Fragment {
                     txtSpeechResult.setText(recognizedStringBuilder.toString());
                 });
             }
+        }
+
+
+        @Override
+        public void onError(SpeechError speechError) {
+
         }
 
 
@@ -336,12 +353,11 @@ public class BottomFragment extends Fragment {
             });
         }
 
-
-
         @Override
         public void onVolumeChanged(int volume, byte[] data) {
-            Log.d("RecognizerListener", "onVolumeChanged: volume = " + volume);
+            // You can leave this method empty if you don't want to handle volume changes.
         }
+
 
         @Override
         public void onBeginOfSpeech() {
@@ -350,13 +366,6 @@ public class BottomFragment extends Fragment {
 
         @Override
         public void onEndOfSpeech() {
-            Log.d("RecognizerListener", "onEndOfSpeech");
-        }
-
-        @Override
-        public void onError(SpeechError speechError) {
-            Log.d("SpeechRecognition", "Error: " + speechError.getPlainDescription(true));
-            Log.e("RecognizerListener", "Error occurred: " + speechError.getPlainDescription(true));
 
         }
 
@@ -591,5 +600,40 @@ public class BottomFragment extends Fragment {
     public void resetUIFromExternal() {
         resetUIElements();
     }
+    private void handleCustomCommands(String recognizedText) {
+        for (CustomCommand cmd : commandsList) {
+            if (recognizedText.contains(cmd.getCommand())) {
+                switch (cmd.getType()) {
+                    case CustomCommand.TYPE_WEB_PAGE:
+                        // 打开网页
+                        openWebPage(cmd.getKeyWords());
+                        break;
+                    case CustomCommand.TYPE_APP:
+                        // 打开应用
+                        openApp(cmd.getKeyWords());
+                        break;
+                    case CustomCommand.TYPE_VIDEO:
+                        // 打开视频
+                        openVideo(cmd.getKeyWords());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
+    private void openWebPage(String url) {
+        // Implement your code to open a web page using the provided URL
+    }
+
+    private void openApp(String packageName) {
+        // Implement your code to open an app using the provided package name
+    }
+
+    private void openVideo(String path) {
+        // Implement your code to open a video using the provided path
+    }
+
 
 }
